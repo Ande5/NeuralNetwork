@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Hash2Vec.ServiceManager.DistanceVectors;
@@ -23,7 +24,7 @@ namespace UniqueVectors.Core
 
         public UniqueVectors(Vocabulary vocabulary, List<DataSets> dataSets, int offsetStart, int offsetEnd)
         {
-            _vocabulary = vocabulary;
+            _vocabulary = vocabulary ?? throw new NullReferenceException("Vocabolary не может быть пустым!");
             _dataSets = dataSets;
             _offsetStart = offsetStart;
             _offsetEnd = offsetEnd; 
@@ -34,14 +35,19 @@ namespace UniqueVectors.Core
             var count = 0;
             for (var k = _offsetStart; k < _offsetEnd; k++)
             {
-                var distanceList = _vocabulary.Distance(_vocabulary.Words[k], 3, 2).ToList();
+                List<DataSets> vectorsEnumerable; DataSets vector;
+                var distanceList = _vocabulary.Distance(_vocabulary.Words[k], 10, 2).ToList();
                 var vectorsDuplicats = distanceList.AsParallel().Where(dis => dis.DistanceValue >= 0.9);
-          
-                var vectorsEnumerable = vectorsDuplicats.AsParallel().SelectMany(vec =>
-                   Data.NewDataSets.Where(data => EqualsVectors(data.Vectors, vec.Representation.NumericVector))).ToList();
 
-                var vector = _dataSets.AsParallel()
-                    .FirstOrDefault(vec => EqualsVectors(vec.Vectors, _vocabulary.Words[k].NumericVector));
+                lock (Sync)
+                {
+                    vectorsEnumerable = vectorsDuplicats.AsParallel().SelectMany(vec =>
+                        Data.NewDataSets.Where(data => EqualsVectors(data.Vectors, vec.Representation.NumericVector))).ToList();
+
+                    vector = Data.NewDataSets.AsParallel()
+                        .FirstOrDefault(vec => EqualsVectors(vec.Vectors, _vocabulary.Words[k].NumericVector));
+                }
+
                 if (vector != null && !vector.IsUnique)
                 {
                     lock (Sync)
@@ -52,6 +58,8 @@ namespace UniqueVectors.Core
                             for (var i = 0; i < vector.Ideals.Length; i++)
                                 if (vector.Ideals[i] < vec.Ideals[i])
                                     vector.Ideals[i] = vec.Ideals[i];
+
+                            vec.IsUnique = false;
                         });
                         vector.IsUnique = true;
                         Data.NewDataSets.Add(vector);
