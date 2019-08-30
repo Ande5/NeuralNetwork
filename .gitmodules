@@ -1,0 +1,3 @@
+[submodule "hash2vec"]
+	path = hash2vec
+	url = https://Ande5@bitbucket.org/Ande5/hash2vec.git

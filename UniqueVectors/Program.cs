@@ -19,14 +19,14 @@ namespace UniqueVectors
             Console.WriteLine("\n>>> Read Data Sets >>>");
             ShowTime(stopWatch.Elapsed);
 
-            var inputDataSets = LoadDataSet("inputSets.txt");
-            var outputDataSets = LoadDataSet("outputSets.txt");
+            var inputDataSets = LoadDataSet("inputDataTest.txt");
+            var outputDataSets = LoadDataSet("outputDataTest.txt");
 
             Console.WriteLine("\n>>> Start Processing UniqueVectors >>>");
             ShowTime(stopWatch.Elapsed);
 
             var dataSets = searchUniqueVectors.CreateDataSets(inputDataSets, outputDataSets);
-            var listDataSets = searchUniqueVectors.CheckUniqueVectorsParallel(dataSets, "inputSets.txt",2);
+            var listDataSets = searchUniqueVectors.CheckUniqueVectorsParallel(dataSets, "inputDataTest.txt",2);
 
             var inputSets = new List<float[]>();
             var outputSets = new List<float[]>();
@@ -40,8 +40,8 @@ namespace UniqueVectors
             Console.WriteLine("\n>>> Save UniqueVectors >>>\n");
             ShowTime(stopWatch.Elapsed);
 
-            SaveVectors(inputSets, "inputSetsNew.txt");
-            SaveVectors(outputSets, "outputSetsNew.txt");
+            SaveVectors(inputSets, "inputSetsTestNew.txt");
+            SaveVectors(outputSets, "outputSetsTestNew.txt");
 
             ShowTime(stopWatch.Elapsed);
             Console.WriteLine("\n<<< Stop Processing <<<");

@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Hash2Vec.ServiceManager.ReadingVectors;
+using System.Collections.Generic;
+
 using NeuralNetwork;
 using UniqueVectors.Core;
+using Hash2Vec.ServiceManager.ReadingVectors;
 
 namespace UniqueVectors.ServicesManager
 {
@@ -90,18 +90,18 @@ namespace UniqueVectors.ServicesManager
             return Data.NewDataSets;
         }
 
-        private void Wait(List<Thread> ThreadList)
+        private void Wait(List<Thread> threadList)
         {
             while (true)
             {
                 int WorkCount = 0;
 
-                for (int i = 0; i < ThreadList.Count; i++)
+                for (int i = 0; i < threadList.Count; i++)
                 {
-                    WorkCount += (ThreadList[i].IsAlive) ? 0 : 1;
+                    WorkCount += (threadList[i].IsAlive) ? 0 : 1;
                 }
 
-                if (WorkCount == ThreadList.Count) break;
+                if (WorkCount == threadList.Count) break;
             }
         }
 

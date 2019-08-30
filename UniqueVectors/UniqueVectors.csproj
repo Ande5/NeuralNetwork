@@ -33,9 +33,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Hash2Vec, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Hash2Vec.0.1.1\lib\netstandard2.0\Hash2Vec.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -58,6 +55,10 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <ProjectReference Include="..\hash2vec\Hash2Vec\Hash2Vec.csproj">
+      <Project>{3f3eda75-96a2-487a-af76-4e284fb376c0}</Project>
+      <Name>Hash2Vec</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NeuralNetwork\NeuralNetwork.csproj">
       <Project>{a9cfd43b-07de-43d4-8c52-99ad78e16a4a}</Project>
       <Name>NeuralNetwork</Name>

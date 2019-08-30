@@ -26,10 +26,8 @@ namespace UniqueVectors.Core
             _vocabulary = vocabulary;
             _dataSets = dataSets;
             _offsetStart = offsetStart;
-            _offsetEnd = offsetEnd;
-            
+            _offsetEnd = offsetEnd; 
         }
-
 
         public void GetUniqueVectors()
         {
@@ -37,14 +35,14 @@ namespace UniqueVectors.Core
             for (var k = _offsetStart; k < _offsetEnd; k++)
             {
                 var distanceList = _vocabulary.Distance(_vocabulary.Words[k], 3, 2).ToList();
-                var vectorsDuplicats = distanceList.AsParallel().Where(dis => dis.DistanceValue >= 0.95);
-
+                var vectorsDuplicats = distanceList.AsParallel().Where(dis => dis.DistanceValue >= 0.9);
+          
                 var vectorsEnumerable = vectorsDuplicats.AsParallel().SelectMany(vec =>
-                    _dataSets.Where(data => EqualsVectors(data.Vectors, vec.Representation.NumericVector))).ToList();
+                   Data.NewDataSets.Where(data => EqualsVectors(data.Vectors, vec.Representation.NumericVector))).ToList();
 
                 var vector = _dataSets.AsParallel()
                     .FirstOrDefault(vec => EqualsVectors(vec.Vectors, _vocabulary.Words[k].NumericVector));
-                if (vector != null)
+                if (vector != null && !vector.IsUnique)
                 {
                     lock (Sync)
                     {
@@ -52,9 +50,10 @@ namespace UniqueVectors.Core
                         Parallel.ForEach(vectorsEnumerable, vec =>
                         {
                             for (var i = 0; i < vector.Ideals.Length; i++)
-                                if (vector.Ideals[i] < vec.Ideals[i]) vector.Ideals[i] = vec.Ideals[i];
+                                if (vector.Ideals[i] < vec.Ideals[i])
+                                    vector.Ideals[i] = vec.Ideals[i];
                         });
-
+                        vector.IsUnique = true;
                         Data.NewDataSets.Add(vector);
                     }
                    
@@ -64,7 +63,8 @@ namespace UniqueVectors.Core
                 {
                     lock (Sync)
                     {
-                        Data.NewDataSets.Remove(data);
+                        if (!data.IsUnique)
+                            Data.NewDataSets.Remove(data);
                     }
                 }
 
