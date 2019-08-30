@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using NeuralNetwork.ServicesManager;
 using UniqueVectors.ServicesManager;
 
 namespace UniqueVectors
@@ -10,7 +12,6 @@ namespace UniqueVectors
     {
         static void Main(string[] args)
         {
-            //var fileManager = new FileManager();
             Console.WriteLine("\n>>> Start Processing >>>");
             var stopWatch = Stopwatch.StartNew();
 
@@ -19,13 +20,19 @@ namespace UniqueVectors
             Console.WriteLine("\n>>> Read Data Sets >>>");
             ShowTime(stopWatch.Elapsed);
 
-            var inputDataSets = LoadDataSet("inputDataTest.txt");
-            var outputDataSets = LoadDataSet("outputDataTest.txt");
+           // var inputDataSets = LoadDataSet("inputDataTest.txt");
+          //  var outputDataSets = LoadDataSet("outputDataTest.txt");
+
+            var inputDataSets = new WordVectorLoader()
+                .LoadVectorsData("vectorizedData", out var outputDataSets);
 
             Console.WriteLine("\n>>> Start Processing UniqueVectors >>>");
             ShowTime(stopWatch.Elapsed);
 
-            var dataSets = searchUniqueVectors.CreateDataSets(inputDataSets, outputDataSets);
+            var inputData = inputDataSets.Select(vec => vec.Select(value => (float)value).ToArray()).ToList();
+            var outputData = outputDataSets.Select(vec => vec.Select(value => (float)value).ToArray()).ToList();
+
+            var dataSets = searchUniqueVectors.CreateDataSets(inputData, outputData);
             var listDataSets = searchUniqueVectors.CheckUniqueVectorsParallel(dataSets, "inputDataTest.txt",2);
 
             var inputSets = new List<float[]>();
